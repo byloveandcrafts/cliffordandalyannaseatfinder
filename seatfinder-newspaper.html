@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Find Your Seat · Clifford & Alyanna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<!-- QR code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+/* ─── TOKENS ─── */
+:root {
+  --ink:          #0d0d0d;
+  --ink-mid:      #2a2a2a;
+  --ink-light:    #555;
+  --ink-faint:    #888;
+  --paper:        #f9f7f2;
+  --paper-mid:    #f0ede6;
+  --paper-dark:   #e4e0d8;
+  --paper-aged:   #d8d3c8;
+  --rule:         #0d0d0d;
+  --rule-thin:    rgba(13,13,13,0.22);
+  --rule-deco:    rgba(13,13,13,0.14);
+  --accent:       #1a1a1a;
+  --t:            0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; scroll-behavior: smooth; }
+
+/* ─── BODY / PAPER BACKGROUND ─── */
+body {
+  font-family: 'Libre Baskerville', serif;
+  background: #c8c3b8;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E");
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Paper texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent,
+    transparent 28px,
+    rgba(0,0,0,0.03) 29px,
+    transparent 30px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── NEWSPAPER WRAPPER ─── */
+.newspaper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  background: var(--paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  min-height: 100vh;
+  box-shadow: 0 0 40px rgba(0,0,0,0.35);
+  padding: 0 0 3rem;
+}
+
+/* ─── MASTHEAD ─── */
+.masthead {
+  padding: 1.1rem 1.4rem 0.6rem;
+  border-bottom: 3px double var(--ink);
+}
+.mast-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.52rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-light);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+.mast-center {
+  text-align: center;
+  padding: 4px 0;
+}
+.mast-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 2px;
+}
+.mast-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2.4rem, 9vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.mast-rule-deco {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 5px 0;
+}
+.mast-rule-deco::before,
+.mast-rule-deco::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ink);
+}
+.mast-rule-deco span {
+  font-size: 0.55rem;
+  color: var(--ink-light);
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mast-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  border-top: 1px solid var(--rule);
+  padding-top: 4px;
+  margin-top: 5px;
+}
+
+/* ─── SECTION RULE ─── */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-top: 3px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 3px 1.4rem;
+  margin: 0;
+}
+.section-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ─── MAIN CONTENT ─── */
+.main-content {
+  padding: 1.2rem 1.4rem 0;
+}
+
+/* ─── HEADLINE BLOCK ─── */
+.headline-block {
+  text-align: center;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+.hl-kicker {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  font-style: italic;
+  margin-bottom: 4px;
+}
+.hl-head {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.7rem, 6vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--ink);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.hl-deck {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-light);
+  line-height: 1.5;
+  max-width: 320px;
+  margin: 0 auto 8px;
+}
+.hl-byline {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ─── INSTRUCTION DINGBAT ─── */
+.instruction-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: var(--paper-mid);
+  border: 1px solid var(--paper-dark);
+  border-left: 3px solid var(--ink);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.2rem;
+}
+.instruction-block .dingbat {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--ink);
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+.instruction-text {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+
+/* ─── SEARCH BOX ─── */
+.search-wrap {
+  margin-bottom: 1.2rem;
+}
+.search-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 5px;
+  display: block;
+}
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  position: relative;
+}
+.search-field::before {
+  content: '◆';
+  font-size: 0.45rem;
+  color: var(--ink);
+  position: absolute;
+  left: 0.85rem;
+  pointer-events: none;
+}
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--ink);
+  padding: 0.85rem 3rem 0.85rem 2.1rem;
+  caret-color: var(--ink);
+}
+.search-input::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.search-clear {
+  position: absolute;
+  right: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  display: none;
+  line-height: 1;
+  font-family: 'Jost', sans-serif;
+  padding: 0.4rem;
+  transition: color var(--t);
+}
+.search-clear.visible { display: block; }
+.search-clear:hover { color: var(--ink); }
+
+/* ─── VIEW ALL TABLES BUTTON ─── */
+.view-tables-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--rule-thin);
+  border-left: none;
+  border-right: none;
+  padding: 0.55rem 0;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: all var(--t);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.view-tables-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+  background: var(--paper-mid);
+}
+.view-tables-btn svg { opacity: 0.5; }
+.view-tables-btn:hover svg { opacity: 1; }
+
+/* ─── RESULTS ─── */
+.results-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* ─── RESULT CARD ─── */
+.result-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  animation: cardIn 0.35s ease both;
+  overflow: hidden;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.card-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(249,247,242,0.5);
+  margin-bottom: 2px;
+}
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--paper);
+  line-height: 1.15;
+}
+.card-table-badge {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.card-companions {
+  padding: 0.85rem 1rem;
+  background: var(--paper-mid);
+  border-top: 1px solid var(--paper-dark);
+}
+.card-companions-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-companions-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--paper-dark);
+}
+.companion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.companion-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.84rem;
+  color: var(--ink-mid);
+  border-bottom: 1px dotted var(--paper-aged);
+  padding-bottom: 0.28rem;
+}
+.companion-row:last-child { border-bottom: none; padding-bottom: 0; }
+.companion-row::before {
+  content: '•';
+  color: var(--ink-faint);
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+
+/* ─── IDLE STATE ─── */
+.idle-state {
+  text-align: center;
+  padding: 2.5rem 0 1rem;
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+.idle-deco {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 3rem;
+  color: var(--paper-aged);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.idle-text {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-faint);
+  line-height: 1.7;
+}
+.idle-rule {
+  width: 40px;
+  height: 1px;
+  background: var(--paper-dark);
+  margin: 0.8rem auto;
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  text-align: center;
+  padding: 2rem 0;
+  animation: fadeUp 0.3s ease both;
+}
+.empty-dingbat {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  color: var(--paper-aged);
+  margin-bottom: 0.4rem;
+}
+.empty-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink-mid);
+  margin-bottom: 0.25rem;
+}
+.empty-body {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── DIVIDERS ─── */
+.col-rule {
+  border: none;
+  border-top: 1px solid var(--rule-thin);
+  margin: 1rem 0;
+}
+.col-rule-heavy {
+  border: none;
+  border-top: 2px solid var(--ink);
+  margin: 0.8rem 0;
+}
+
+/* ─── FOOTER ─── */
+.footer {
+  position: relative;
+  z-index: 1;
+  border-top: 3px double var(--ink);
+  padding: 0.9rem 1.4rem 0;
+  margin-top: 2rem;
+  text-align: center;
+}
+.footer-masthead {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.5rem;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.footer-date {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.footer-rule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+}
+.footer-rule::before, .footer-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule-thin);
+}
+.footer-rule span {
+  font-size: 0.5rem;
+  color: var(--ink-faint);
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ─── ADMIN PANEL ─── */
+#admin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(13,13,13,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#admin-overlay.hidden { display: none; }
+.admin-panel {
+  background: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  border-top: 3px double var(--ink);
+  padding: 1.8rem 1.4rem 3rem;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+  animation: sheetUp 0.32s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.admin-handle {
+  width: 36px;
+  height: 3px;
+  background: var(--paper-aged);
+  margin: 0 auto 1.4rem;
+}
+.admin-masthead {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.6rem;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.admin-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--rule-thin);
+}
+.afield { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.7rem; }
+.afield label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.afield input {
+  background: var(--paper-mid);
+  border: 1px solid var(--paper-dark);
+  border-bottom: 1.5px solid var(--ink);
+  padding: 0.6rem 0.75rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--t);
+}
+.afield input:focus { border-color: var(--ink); border-bottom-color: var(--ink); background: var(--paper); }
+.afield input::placeholder { color: var(--ink-faint); font-style: italic; }
+.btn-add-guest {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 0.65rem 1.4rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t);
+  margin-bottom: 1.2rem;
+}
+.btn-add-guest:hover { background: var(--ink-mid); }
+.admin-list-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 0.5rem;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--rule-thin);
+}
+.admin-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; margin-bottom: 1rem; }
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--paper-mid);
+  border: 1px solid var(--paper-dark);
+}
+.admin-row-name { font-family: 'Libre Baskerville', serif; font-size: 0.85rem; color: var(--ink); flex: 1; }
+.admin-row-meta { font-family: 'Jost', sans-serif; font-size: 0.62rem; color: var(--ink-faint); letter-spacing: 0.08em; }
+.btn-del {
+  background: none;
+  border: 1px solid var(--paper-aged);
+  color: var(--ink-faint);
+  width: 22px; height: 22px;
+  font-size: 0.6rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--t); flex-shrink: 0;
+}
+.btn-del:hover { border-color: #8b2020; color: #8b2020; }
+.admin-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border-top: 1px solid var(--rule-thin);
+  padding-top: 0.9rem;
+}
+.abtn {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.54rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: all var(--t);
+  border: 1px solid;
+  background: none;
+}
+.abtn-export { border-color: var(--ink); color: var(--ink); }
+.abtn-export:hover { background: var(--ink); color: var(--paper); }
+.abtn-import { border-color: var(--ink-light); color: var(--ink-light); display: inline-block; }
+.abtn-import:hover { background: var(--ink-light); color: var(--paper); }
+.abtn-clear { border-color: var(--paper-aged); color: var(--ink-faint); }
+.abtn-clear:hover { border-color: #8b2020; color: #8b2020; }
+.abtn-close { border-color: var(--ink); color: var(--ink); width: 100%; margin-top: 0.3rem; text-align: center; }
+.abtn-close:hover { background: var(--ink); color: var(--paper); }
+
+/* ─── TABLES OVERLAY ─── */
+#tables-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(13,13,13,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#tables-overlay.hidden { display: none; }
+.tables-panel {
+  background: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  border-top: 3px double var(--ink);
+  padding: 1.8rem 1.4rem 2.5rem;
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+  animation: sheetUp 0.32s cubic-bezier(0.32,0.72,0,1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.tables-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.7rem;
+}
+.tables-masthead {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.6rem;
+  color: var(--ink);
+  line-height: 1;
+}
+.tables-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+.tables-close {
+  background: var(--paper-mid);
+  border: 1px solid var(--paper-dark);
+  width: 28px; height: 28px;
+  font-size: 0.65rem;
+  color: var(--ink-mid);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: all var(--t);
+}
+.tables-close:hover { background: var(--ink); color: var(--paper); }
+.tables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+@media(max-width: 360px) { .tables-grid { grid-template-columns: 1fr; } }
+.table-card {
+  border: 1px solid var(--ink);
+  overflow: hidden;
+  animation: cardIn 0.3s ease both;
+}
+.table-card-header {
+  background: var(--ink);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-card-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper);
+  font-weight: 600;
+}
+.table-card-count {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.52rem;
+  color: rgba(249,247,242,0.55);
+}
+.table-card-guests {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+.table-guest-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px dotted var(--paper-aged);
+}
+.table-guest-row:last-child { border-bottom: none; }
+.table-guest-row::before {
+  content: '—';
+  color: var(--ink-faint);
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+.table-guest-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.78rem;
+  color: var(--ink-mid);
+}
+.tables-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 1.5rem 0;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+/* ─── QR PANEL (Admin QR generator) ─── */
+#qr-overlay {
+  position: fixed; inset: 0; z-index: 901;
+  background: rgba(13,13,13,0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+#qr-overlay.hidden { display: none; }
+.qr-panel {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  padding: 2rem 1.8rem;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  animation: fadeZoomIn 0.3s ease;
+}
+@keyframes fadeZoomIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.qr-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.qr-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--rule-thin);
+}
+.qr-name-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.qr-table-display {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.54rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 1rem;
+}
+#qr-canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--paper-dark);
+  padding: 1rem;
+  margin: 0 auto 0.75rem;
+  width: fit-content;
+  min-width: 160px;
+  min-height: 160px;
+}
+.qr-url-display {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  word-break: break-all;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: var(--paper-mid);
+  border: 1px solid var(--paper-dark);
+}
+.qr-footer-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+.qr-footer-btns .abtn { flex: 1; text-align: center; }
+
+/* ─── QR SECTION IN RESULT CARD ─── */
+.card-qr-section {
+  padding: 0.85rem 1rem;
+  background: var(--paper);
+  border-top: 1px dashed var(--paper-aged);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.card-qr-box {
+  flex-shrink: 0;
+  background: white;
+  border: 1px solid var(--paper-dark);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-qr-text {
+  flex: 1;
+}
+.card-qr-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 3px;
+}
+.card-qr-desc {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--ink-mid);
+  line-height: 1.5;
+}
+.card-qr-save {
+  display: inline-block;
+  margin-top: 5px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule-thin);
+  padding: 0;
+  transition: border-color var(--t);
+}
+.card-qr-save:hover { border-color: var(--ink); }
+
+/* ─── UTILITY ─── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="newspaper">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="mast-top-bar">
+      <span>Tagaytay City, Philippines</span>
+      <span>Wedding Edition · Vol. I</span>
+      <span>Mayo 17, 2026</span>
+    </div>
+    <div class="mast-center">
+      <div class="mast-label">Seating Gazette of the</div>
+      <div class="mast-title">Clifford & Alyanna</div>
+      <div class="mast-rule-deco">
+        <span>✦ &nbsp; Nuptial Reception &nbsp; ✦</span>
+      </div>
+    </div>
+    <div class="mast-bottom-bar">
+      <span>Issue No. 1 · Est. 2026</span>
+      <span>#FordtheoneforYanna</span>
+      <span>Printed in Love</span>
+    </div>
+  </header>
+
+  <!-- SECTION LABEL -->
+  <div class="section-rule">
+    <span class="section-label">Guest Seating Correspondent</span>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- HEADLINE -->
+    <div class="headline-block">
+      <div class="hl-kicker">Official Dispatch — May 17, 2026</div>
+      <h1 class="hl-head">Find Your<br><em style="font-style:italic;font-weight:400;">Reserved Seat</em></h1>
+      <p class="hl-deck">All guests are cordially invited to locate their assigned table at Midlands Veranda, Tagaytay Highlands.</p>
+      <p class="hl-byline">By Order of the Wedding Committee · Midlands Veranda, Tagaytay</p>
+    </div>
+
+    <!-- INSTRUCTION -->
+    <div class="instruction-block">
+      <span class="dingbat">¶</span>
+      <p class="instruction-text">Search your full name in the correspondent field below. Your table assignment and party companions will be duly reported. Present your QR code to the usher upon arrival.</p>
+    </div>
+
+    <!-- VIEW ALL TABLES -->
+    <button class="view-tables-btn" onclick="openTables()">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="5" height="5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="10" y="1" width="5" height="5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="1" y="10" width="5" height="5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="10" y="10" width="5" height="5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      View Full Seating Arrangement
+    </button>
+
+    <!-- SEARCH -->
+    <div class="search-wrap">
+      <span class="search-label">Search Guest Register</span>
+      <div class="search-field">
+        <input
+          type="text"
+          class="search-input"
+          id="sf-search"
+          placeholder="Type your name here..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          oninput="sfSearch()"
+          onkeydown="sfKey(event)"
+        />
+        <button class="search-clear" id="sf-clear" onclick="sfClear()">✕</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-area" id="sf-results">
+      <div class="idle-state">
+        <div class="idle-deco">C&amp;A</div>
+        <div class="idle-rule"></div>
+        <p class="idle-text">Begin typing your name to discover<br>your place at our celebration.</p>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-masthead">Clifford &amp; Alyanna</div>
+    <p class="footer-date">Mayo 17, 2026 · Tagaytay Highlands · #FordtheoneforYanna</p>
+    <div class="footer-rule"><span>End of Edition</span></div>
+  </footer>
+
+</div><!-- /newspaper -->
+
+<!-- TABLES OVERLAY -->
+<div id="tables-overlay" class="hidden">
+  <div class="tables-panel">
+    <div class="tables-panel-header">
+      <div>
+        <div class="tables-masthead">All Tables</div>
+        <div class="tables-sub">Complete Seating Arrangement · Mayo 17, 2026</div>
+      </div>
+      <button class="tables-close" onclick="closeTables()">✕</button>
+    </div>
+    <div class="tables-grid" id="tables-grid"></div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay" class="hidden" onclick="adminBackdrop(event)">
+  <div class="admin-panel">
+    <div class="admin-handle"></div>
+    <div class="admin-masthead">The Gazette Admin</div>
+    <div class="admin-sub">Manage the wedding guest register for Clifford &amp; Alyanna</div>
+
+    <div class="afield">
+      <label>Guest Name</label>
+      <input type="text" id="admin-name" placeholder="e.g. Maria Santos" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Table Assignment</label>
+      <input type="text" id="admin-table" placeholder="e.g. Table 3" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Seated With (comma-separated)</label>
+      <input type="text" id="admin-companions" placeholder="e.g. Jose Reyes, Ana Cruz" autocomplete="off"/>
+    </div>
+    <button class="btn-add-guest" onclick="addGuest()">+ Add to Register</button>
+
+    <div class="admin-list-label">
+      Guest Register <span id="guest-count"></span>
+    </div>
+    <div class="admin-list" id="admin-list"></div>
+
+    <div class="admin-footer">
+      <button class="abtn abtn-export" onclick="exportData()">Export JSON</button>
+      <label class="abtn abtn-import">Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+      <button class="abtn abtn-clear" onclick="clearAll()">Clear All</button>
+      <button class="abtn abtn-close" onclick="closeAdmin()">Close Edition</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR OVERLAY -->
+<div id="qr-overlay" class="hidden" onclick="qrBackdrop(event)">
+  <div class="qr-panel">
+    <div class="qr-title">Your QR Ticket</div>
+    <div class="qr-sub">Present this at the entrance</div>
+    <div class="qr-name-display" id="qr-name-display"></div>
+    <div class="qr-table-display" id="qr-table-display"></div>
+    <div id="qr-canvas-wrap"></div>
+    <div class="qr-url-display" id="qr-url-display"></div>
+    <div class="qr-footer-btns">
+      <button class="abtn abtn-export" onclick="downloadQR()">Save QR</button>
+      <button class="abtn abtn-close" onclick="closeQR()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── GUEST DATA ── */
+const STORAGE_KEY = 'ca_seatfinder_v1';
+let guests = [];
+
+function loadGuests() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    guests = raw ? JSON.parse(raw) : getDefaultGuests();
+    if (!raw) saveGuests();
+  } catch(e) { guests = getDefaultGuests(); }
+}
+function saveGuests() { localStorage.setItem(STORAGE_KEY, JSON.stringify(guests)); }
+function getDefaultGuests() {
+  return [
+    { name: "Clifford", table: "Bridal Table", companions: ["Alyanna", "Best Man", "Maid of Honor"] },
+    { name: "Alyanna", table: "Bridal Table", companions: ["Clifford", "Best Man", "Maid of Honor"] },
+  ];
+}
+
+/* ── SEARCH ── */
+function sfSearch() {
+  const q = document.getElementById('sf-search').value.trim();
+  const clear = document.getElementById('sf-clear');
+  const area = document.getElementById('sf-results');
+
+  // Secret admin passcode
+  if (q.toLowerCase() === 'admin123') {
+    document.getElementById('sf-search').value = '';
+    clear.classList.remove('visible');
+    area.innerHTML = idleHTML();
+    openAdmin();
+    return;
+  }
+
+  clear.classList.toggle('visible', q.length > 0);
+  area.innerHTML = '';
+
+  if (!q) {
+    area.innerHTML = idleHTML();
+    return;
+  }
+
+  const matches = guests.filter(g => g.name.toLowerCase().includes(q.toLowerCase()));
+
+  if (!matches.length) {
+    area.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-dingbat">✦</div>
+        <div class="empty-head">No Entry Found</div>
+        <p class="empty-body">No record for &ldquo;<em>${esc(q)}</em>&rdquo; in the guest register.<br>Please verify spelling or consult an usher.</p>
+      </div>`;
+    return;
+  }
+
+  matches.forEach((g, i) => {
+    const companions = (g.companions || []).filter(Boolean);
+    const compRows = companions.length
+      ? companions.map(c => `<div class="companion-row">${esc(c)}</div>`).join('')
+      : `<div style="font-family:'IM Fell English',serif;font-style:italic;font-size:0.82rem;color:var(--ink-faint);">Seat reserved exclusively for you.</div>`;
+
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.animationDelay = `${i * 75}ms`;
+
+    // QR inline container id
+    const qrId = `qr-inline-${i}-${Date.now()}`;
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <div class="card-eyebrow">Your Name — Guest Register</div>
+          <div class="card-name">${esc(g.name)}</div>
+        </div>
+        <div class="card-table-badge">${esc(g.table)}</div>
+      </div>
+      <div class="card-companions">
+        <div class="card-companions-label">Seated with</div>
+        <div class="companion-list">${compRows}</div>
+      </div>
+      <div class="card-qr-section">
+        <div class="card-qr-box" id="${qrId}"></div>
+        <div class="card-qr-text">
+          <div class="card-qr-label">Your QR Entry Pass</div>
+          <div class="card-qr-desc">Show this code to the usher at the entrance for swift seating.</div>
+          <button class="card-qr-save" onclick="openQR(${JSON.stringify(esc(g.name))}, ${JSON.stringify(esc(g.table))})">View Full QR →</button>
+        </div>
+      </div>
+    `;
+    area.appendChild(card);
+
+    // Render small inline QR after DOM insert
+    requestAnimationFrame(() => {
+      const wrap = document.getElementById(qrId);
+      if (!wrap) return;
+      const url = buildQRUrl(g.name);
+      try {
+        new QRCode(wrap, {
+          text: url,
+          width: 72,
+          height: 72,
+          colorDark: '#0d0d0d',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M,
+        });
+      } catch(e) { wrap.innerHTML = ''; }
+    });
+  });
+}
+
+function idleHTML() {
+  return `<div class="idle-state">
+    <div class="idle-deco">C&amp;A</div>
+    <div class="idle-rule"></div>
+    <p class="idle-text">Begin typing your name to discover<br>your place at our celebration.</p>
+  </div>`;
+}
+
+function sfClear() {
+  document.getElementById('sf-search').value = '';
+  document.getElementById('sf-clear').classList.remove('visible');
+  sfSearch();
+  document.getElementById('sf-search').focus();
+}
+function sfKey(e) { if (e.key === 'Escape') sfClear(); }
+
+/* ── QR HELPERS ── */
+function buildQRUrl(name) {
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return `${base}?name=${encodeURIComponent(name)}`;
+}
+
+let activeQRCode = null;
+
+function openQR(name, table) {
+  document.getElementById('qr-name-display').textContent = name;
+  document.getElementById('qr-table-display').textContent = table;
+
+  const wrap = document.getElementById('qr-canvas-wrap');
+  wrap.innerHTML = '';
+  activeQRCode = null;
+
+  const url = buildQRUrl(name);
+  document.getElementById('qr-url-display').textContent = url;
+
+  try {
+    activeQRCode = new QRCode(wrap, {
+      text: url,
+      width: 200,
+      height: 200,
+      colorDark: '#0d0d0d',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+  } catch(e) {
+    wrap.innerHTML = `<p style="font-size:.7rem;color:var(--ink-faint);padding:1rem;">QR unavailable</p>`;
+  }
+
+  document.getElementById('qr-overlay').classList.remove('hidden');
+}
+
+function closeQR() { document.getElementById('qr-overlay').classList.add('hidden'); }
+function qrBackdrop(e) { if (e.target === e.currentTarget) closeQR(); }
+
+function downloadQR() {
+  const wrap = document.getElementById('qr-canvas-wrap');
+  const canvas = wrap.querySelector('canvas');
+  if (!canvas) {
+    const img = wrap.querySelector('img');
+    if (img) {
+      const a = document.createElement('a');
+      a.href = img.src;
+      a.download = `seat-qr-${Date.now()}.png`;
+      a.click();
+    }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `seat-qr-${Date.now()}.png`;
+  a.click();
+}
+
+/* ── ADMIN ── */
+function openAdmin() { document.getElementById('admin-overlay').classList.remove('hidden'); renderAdminList(); updateGuestCount(); }
+function closeAdmin() { document.getElementById('admin-overlay').classList.add('hidden'); }
+function adminBackdrop(e) { if (e.target === e.currentTarget) closeAdmin(); }
+
+/* ── TABLES ── */
+function openTables() { renderTables(); document.getElementById('tables-overlay').classList.remove('hidden'); }
+function closeTables() { document.getElementById('tables-overlay').classList.add('hidden'); }
+
+function renderTables() {
+  const grid = document.getElementById('tables-grid');
+  if (!grid) return;
+  if (!guests.length) {
+    grid.innerHTML = `<div class="tables-empty">No guests recorded yet.</div>`;
+    return;
+  }
+  const map = {};
+  guests.forEach(g => {
+    const k = g.table || 'Unassigned';
+    if (!map[k]) map[k] = [];
+    map[k].push(g.name);
+  });
+  const sorted = Object.keys(map).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  grid.innerHTML = sorted.map((table, i) => {
+    const names = map[table];
+    const rows = names.map(n => `<div class="table-guest-row"><span class="table-guest-name">${esc(n)}</span></div>`).join('');
+    return `<div class="table-card" style="animation-delay:${i*45}ms">
+      <div class="table-card-header">
+        <span class="table-card-name">${esc(table)}</span>
+        <span class="table-card-count">${names.length} guest${names.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="table-card-guests">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── ADMIN CRUD ── */
+function addGuest() {
+  const n = document.getElementById('admin-name');
+  const t = document.getElementById('admin-table');
+  const c = document.getElementById('admin-companions');
+  const name = n.value.trim(), table = t.value.trim();
+  const companions = c.value.split(',').map(s => s.trim()).filter(Boolean);
+  if (!name || !table) {
+    if (!name) flashInvalid(n);
+    if (!table) flashInvalid(t);
+    return;
+  }
+  guests.push({ name, table, companions });
+  saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+  n.value = ''; t.value = ''; c.value = ''; n.focus();
+}
+function deleteGuest(i) { guests.splice(i, 1); saveGuests(); renderAdminList(); updateGuestCount(); sfSearch(); }
+function renderAdminList() {
+  const list = document.getElementById('admin-list');
+  if (!list) return;
+  if (!guests.length) {
+    list.innerHTML = `<p style="font-size:0.8rem;color:var(--ink-faint);padding:0.5rem 0;font-family:'IM Fell English',serif;font-style:italic;">No guests in the register yet.</p>`;
+    return;
+  }
+  list.innerHTML = guests.map((g, i) => `
+    <div class="admin-row">
+      <div style="flex:1;min-width:0">
+        <div class="admin-row-name">${esc(g.name)}</div>
+        <div class="admin-row-meta">${esc(g.table)}${g.companions?.length ? ' · ' + g.companions.length + ' companion' + (g.companions.length > 1 ? 's' : '') : ''}</div>
+      </div>
+      <button class="btn-del" onclick="deleteGuest(${i})">✕</button>
+    </div>`).join('');
+}
+function updateGuestCount() {
+  const el = document.getElementById('guest-count');
+  if (el) el.textContent = `(${guests.length})`;
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(guests, null, 2)], { type: 'application/json' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'wedding-guests.json' });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error();
+      guests = data.filter(g => g.name && g.table);
+      saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+    } catch(err) { alert('Import failed — please use a valid JSON file.'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+function clearAll() {
+  if (!confirm('Remove all guests from the register? This cannot be undone.')) return;
+  guests = []; saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+}
+function flashInvalid(el) {
+  el.style.borderBottomColor = '#8b2020';
+  setTimeout(() => (el.style.borderBottomColor = ''), 1200);
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  loadGuests();
+  renderAdminList();
+  updateGuestCount();
+
+  // URL param prefill ?name=...
+  const params = new URLSearchParams(window.location.search);
+  const pre = params.get('name') || params.get('n');
+  if (pre) {
+    const input = document.getElementById('sf-search');
+    input.value = decodeURIComponent(pre);
+    document.getElementById('sf-clear').classList.add('visible');
+    sfSearch();
+  }
+
+  document.getElementById('tables-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeTables();
+  });
+
+  setTimeout(() => document.getElementById('sf-search').focus(), 400);
+});
+</script>
+</body>
+</html>
