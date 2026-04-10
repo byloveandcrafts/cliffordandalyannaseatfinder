@@ -6,7 +6,7 @@
 <title>GAZETA NG MGA UPUAN · Clifford & Alyanna</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* ─── TOKENS ─── */
@@ -103,8 +103,11 @@ body::before {
   margin-bottom: 4px;
 }
 .mast-title {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: clamp(2.2rem, 9vw, 3.2rem);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 10vw, 3.6rem);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.06em;
   color: var(--ink);
   line-height: 1;
   margin-bottom: 4px;
@@ -448,8 +451,11 @@ body::before {
   animation: fadeUp 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .idle-deco {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 3.2rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.6rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.08em;
   color: var(--paper-aged);
   line-height: 1;
   margin-bottom: 0.4rem;
@@ -515,8 +521,11 @@ body::before {
   text-align: center;
 }
 .footer-masthead {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 1.6rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.06em;
   color: var(--ink);
   line-height: 1;
   margin-bottom: 5px;
@@ -597,8 +606,11 @@ body::before {
   margin: 0 auto 1.5rem;
 }
 .admin-masthead {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 1.7rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.04em;
   color: var(--ink);
   margin-bottom: 0.3rem;
 }
@@ -738,8 +750,11 @@ body::before {
   padding-bottom: 0.8rem;
 }
 .tables-masthead {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 1.8rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.04em;
   color: var(--ink);
   line-height: 1;
   margin-bottom: 4px;
@@ -843,8 +858,11 @@ body::before {
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 .qr-title {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 1.6rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.04em;
   color: var(--ink);
   margin-bottom: 4px;
 }
@@ -1092,33 +1110,33 @@ body::before {
 <div id="admin-overlay" class="overlay-wrap hidden" onclick="adminBackdrop(event)">
   <div class="admin-panel">
     <div class="admin-handle"></div>
-    <div class="admin-masthead">The Gazette Admin</div>
-    <div class="admin-sub">Manage the wedding guest register for Clifford &amp; Alyanna</div>
+    <div class="admin-masthead">Pahina ng Tagapangasiwa</div>
+    <div class="admin-sub">Pamahalaan ang talaan ng mga panauhin para kay Clifford &amp; Alyanna</div>
 
     <div class="afield">
-      <label>Guest Name</label>
-      <input type="text" id="admin-name" placeholder="e.g. Maria Santos" autocomplete="off"/>
+      <label>Pangalan ng Panauhin</label>
+      <input type="text" id="admin-name" placeholder="hal. Maria Santos" autocomplete="off"/>
     </div>
     <div class="afield">
-      <label>Table Assignment</label>
-      <input type="text" id="admin-table" placeholder="e.g. Table 3" autocomplete="off"/>
+      <label>Itinalagang Mesa</label>
+      <input type="text" id="admin-table" placeholder="hal. Mesa 3" autocomplete="off"/>
     </div>
     <div class="afield">
-      <label>Seated With (comma-separated)</label>
-      <input type="text" id="admin-companions" placeholder="e.g. Jose Reyes, Ana Cruz" autocomplete="off"/>
+      <label>Kasama sa Mesa (pahiwalayin ng kuwit)</label>
+      <input type="text" id="admin-companions" placeholder="hal. Jose Reyes, Ana Cruz" autocomplete="off"/>
     </div>
-    <button class="btn-add-guest" onclick="addGuest()">+ Add to Register</button>
+    <button class="btn-add-guest" onclick="addGuest()">+ Idagdag sa Talaan</button>
 
     <div class="admin-list-label">
-      Guest Register <span id="guest-count"></span>
+      Talaan ng mga Panauhin <span id="guest-count"></span>
     </div>
     <div class="admin-list" id="admin-list"></div>
 
     <div class="admin-footer">
-      <button class="abtn abtn-export" onclick="exportData()">Export JSON</button>
-      <label class="abtn abtn-import">Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
-      <button class="abtn abtn-clear" onclick="clearAll()">Clear All</button>
-      <button class="abtn abtn-close" onclick="closeAdmin()">Close Edition</button>
+      <button class="abtn abtn-export" onclick="exportData()">I-export ang JSON</button>
+      <label class="abtn abtn-import">Mag-import ng JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+      <button class="abtn abtn-clear" onclick="clearAll()">Burahin Lahat</button>
+      <button class="abtn abtn-close" onclick="closeAdmin()">Isara ang Pahina</button>
     </div>
   </div>
 </div>
@@ -1334,7 +1352,7 @@ function renderTables() {
   const grid = document.getElementById('tables-grid');
   if (!grid) return;
   if (!guests.length) {
-    grid.innerHTML = `<div class="tables-empty">No guests recorded yet.</div>`;
+    grid.innerHTML = `<div class="tables-empty">Wala pang naitalang mga panauhin.</div>`;
     return;
   }
   const map = {};
@@ -1350,7 +1368,7 @@ function renderTables() {
     return `<div class="table-card" style="animation-delay:${i*50}ms">
       <div class="table-card-header">
         <span class="table-card-name">${esc(table)}</span>
-        <span class="table-card-count">${names.length} guest${names.length !== 1 ? 's' : ''}</span>
+        <span class="table-card-count">${names.length} panauhin</span>
       </div>
       <div class="table-card-guests">${rows}</div>
     </div>`;
@@ -1378,14 +1396,14 @@ function renderAdminList() {
   const list = document.getElementById('admin-list');
   if (!list) return;
   if (!guests.length) {
-    list.innerHTML = `<p style="font-size:0.85rem;color:var(--ink-faint);padding:0.5rem 0;font-family:'IM Fell English',serif;font-style:italic;">No guests in the register yet.</p>`;
+    list.innerHTML = `<p style="font-size:0.85rem;color:var(--ink-faint);padding:0.5rem 0;font-family:'IM Fell English',serif;font-style:italic;">Wala pang mga panauhin sa talaan.</p>`;
     return;
   }
   list.innerHTML = guests.map((g, i) => `
     <div class="admin-row">
       <div style="flex:1;min-width:0">
         <div class="admin-row-name">${esc(g.name)}</div>
-        <div class="admin-row-meta">${esc(g.table)}${g.companions?.length ? ' · ' + g.companions.length + ' companion' + (g.companions.length > 1 ? 's' : '') : ''}</div>
+        <div class="admin-row-meta">${esc(g.table)}${g.companions?.length ? ' · ' + g.companions.length + ' kasama' + (g.companions.length > 1 ? '' : '') : ''}</div>
       </div>
       <button class="btn-del" onclick="deleteGuest(${i})">✕</button>
     </div>`).join('');
@@ -1408,13 +1426,13 @@ function importData(e) {
       if (!Array.isArray(data)) throw new Error();
       guests = data.filter(g => g.name && g.table);
       saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
-    } catch(err) { alert('Import failed — please use a valid JSON file.'); }
+    } catch(err) { alert('Nabigo ang pag-import — mangyaring gumamit ng wastong JSON file.'); }
     e.target.value = '';
   };
   reader.readAsText(file);
 }
 function clearAll() {
-  if (!confirm('Remove all guests from the register? This cannot be undone.')) return;
+  if (!confirm('Aalisin ang lahat ng panauhin mula sa talaan? Hindi na ito mababawi.')) return;
   guests = []; saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
 }
 function flashInvalid(el) {
