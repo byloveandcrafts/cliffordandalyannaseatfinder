@@ -1084,7 +1084,7 @@ body::before {
       <div class="idle-state">
         <div class="idle-deco">C&amp;A</div>
         <div class="idle-rule"></div>
-        <p class="idle-text">SImulan ang paglalagay ng iyong pangalan upang matuklasan ang iyong lugar<br>sa aming pagdiriwang.</p>
+        <p class="idle-text">Simulan ang paglalagay ng iyong pangalan upang matuklasan ang iyong lugar<br>sa aming pagdiriwang.</p>
       </div>
     </div>
 
@@ -1156,19 +1156,53 @@ body::before {
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCnHhAE5N6JcJlZpQtSA_VsPSnLVhczh5w",
+  authDomain: "clifford-and-alyanna.firebaseapp.com",
+  projectId: "clifford-and-alyanna",
+  storageBucket: "clifford-and-alyanna.firebasestorage.app",
+  messagingSenderId: "897111732601",
+  appId: "1:897111732601:web:4047b821e56a012099ffa8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const guestDocRef = doc(db, "seatfinder", "guestData"); // Saves all data to a single document
+
 /* ── GUEST DATA ── */
-const STORAGE_KEY = 'ca_seatfinder_v1';
 let guests = [];
 
-function loadGuests() {
+async function loadGuests() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    guests = raw ? JSON.parse(raw) : getDefaultGuests();
-    if (!raw) saveGuests();
-  } catch(e) { guests = getDefaultGuests(); }
+    const docSnap = await getDoc(guestDocRef);
+    if (docSnap.exists()) {
+      guests = docSnap.data().guests || [];
+    } else {
+      guests = getDefaultGuests();
+      await saveGuests(); // Initialize defaults in Firestore
+    }
+  } catch(e) { 
+    console.error("Firebase Error:", e);
+    guests = getDefaultGuests(); 
+  }
+  
+  renderAdminList();
+  updateGuestCount();
+  checkUrlParams(); // Prefill logic moved here so it waits for DB to load
 }
-function saveGuests() { localStorage.setItem(STORAGE_KEY, JSON.stringify(guests)); }
+
+async function saveGuests() { 
+  try {
+    await setDoc(guestDocRef, { guests: guests });
+  } catch(e) {
+    console.error("Firebase Save Error:", e);
+  }
+}
+
 function getDefaultGuests() {
   return [
     { name: "Clifford", table: "Bridal Table", companions: ["Alyanna", "Best Man", "Maid of Honor"] },
@@ -1219,9 +1253,8 @@ function sfSearch() {
 
     const card = document.createElement('div');
     card.className = 'result-card';
-    card.style.animationDelay = `${i * 90}ms`; // Staggered animation delay
+    card.style.animationDelay = `${i * 90}ms`;
 
-    // QR inline container id
     const qrId = `qr-inline-${i}-${Date.now()}`;
 
     card.innerHTML = `
@@ -1247,18 +1280,14 @@ function sfSearch() {
     `;
     area.appendChild(card);
 
-    // Render small inline QR after DOM insert
     requestAnimationFrame(() => {
       const wrap = document.getElementById(qrId);
       if (!wrap) return;
       const url = buildQRUrl(g.name);
       try {
         new QRCode(wrap, {
-          text: url,
-          width: 76,
-          height: 76,
-          colorDark: '#0d0d0d',
-          colorLight: '#ffffff',
+          text: url, width: 76, height: 76,
+          colorDark: '#0d0d0d', colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M,
         });
       } catch(e) { wrap.innerHTML = ''; }
@@ -1303,11 +1332,8 @@ function openQR(name, table) {
 
   try {
     activeQRCode = new QRCode(wrap, {
-      text: url,
-      width: 200,
-      height: 200,
-      colorDark: '#0d0d0d',
-      colorLight: '#ffffff',
+      text: url, width: 200, height: 200,
+      colorDark: '#0d0d0d', colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M,
     });
   } catch(e) {
@@ -1375,23 +1401,38 @@ function renderTables() {
   }).join('');
 }
 
-/* ── ADMIN CRUD ── */
-function addGuest() {
+/* ── ADMIN CRUD (Now Async) ── */
+async function addGuest() {
   const n = document.getElementById('admin-name');
   const t = document.getElementById('admin-table');
   const c = document.getElementById('admin-companions');
   const name = n.value.trim(), table = t.value.trim();
   const companions = c.value.split(',').map(s => s.trim()).filter(Boolean);
+  
   if (!name || !table) {
     if (!name) flashInvalid(n);
     if (!table) flashInvalid(t);
     return;
   }
+  
   guests.push({ name, table, companions });
-  saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+  await saveGuests(); 
+  
+  renderAdminList(); 
+  updateGuestCount(); 
+  sfSearch();
+  
   n.value = ''; t.value = ''; c.value = ''; n.focus();
 }
-function deleteGuest(i) { guests.splice(i, 1); saveGuests(); renderAdminList(); updateGuestCount(); sfSearch(); }
+
+async function deleteGuest(i) { 
+  guests.splice(i, 1); 
+  await saveGuests(); 
+  renderAdminList(); 
+  updateGuestCount(); 
+  sfSearch(); 
+}
+
 function renderAdminList() {
   const list = document.getElementById('admin-list');
   if (!list) return;
@@ -1408,37 +1449,50 @@ function renderAdminList() {
       <button class="btn-del" onclick="deleteGuest(${i})">✕</button>
     </div>`).join('');
 }
+
 function updateGuestCount() {
   const el = document.getElementById('guest-count');
   if (el) el.textContent = `(${guests.length})`;
 }
+
 function exportData() {
   const blob = new Blob([JSON.stringify(guests, null, 2)], { type: 'application/json' });
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'wedding-guests.json' });
   a.click(); URL.revokeObjectURL(a.href);
 }
+
 function importData(e) {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = (ev) => {
+  reader.onload = async (ev) => {
     try {
       const data = JSON.parse(ev.target.result);
       if (!Array.isArray(data)) throw new Error();
       guests = data.filter(g => g.name && g.table);
-      saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+      await saveGuests();
+      renderAdminList(); 
+      updateGuestCount(); 
+      sfSearch();
     } catch(err) { alert('Nabigo ang pag-import — mangyaring gumamit ng wastong JSON file.'); }
     e.target.value = '';
   };
   reader.readAsText(file);
 }
-function clearAll() {
+
+async function clearAll() {
   if (!confirm('Aalisin ang lahat ng panauhin mula sa talaan? Hindi na ito mababawi.')) return;
-  guests = []; saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+  guests = []; 
+  await saveGuests(); 
+  renderAdminList(); 
+  updateGuestCount(); 
+  sfSearch();
 }
+
 function flashInvalid(el) {
   el.style.borderBottomColor = '#8b2020';
   setTimeout(() => (el.style.borderBottomColor = ''), 1200);
 }
+
 function esc(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -1447,13 +1501,7 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
-/* ── INIT ── */
-document.addEventListener('DOMContentLoaded', () => {
-  loadGuests();
-  renderAdminList();
-  updateGuestCount();
-
-  // URL param prefill ?name=...
+function checkUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const pre = params.get('name') || params.get('n');
   if (pre) {
@@ -1462,6 +1510,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sf-clear').classList.add('visible');
     sfSearch();
   }
+}
+
+// Attach all functions to window so HTML inline handlers still work with modules
+window.sfSearch = sfSearch;
+window.sfClear = sfClear;
+window.sfKey = sfKey;
+window.openTables = openTables;
+window.closeTables = closeTables;
+window.addGuest = addGuest;
+window.deleteGuest = deleteGuest;
+window.exportData = exportData;
+window.importData = importData;
+window.clearAll = clearAll;
+window.openAdmin = openAdmin;
+window.closeAdmin = closeAdmin;
+window.adminBackdrop = adminBackdrop;
+window.openQR = openQR;
+window.closeQR = closeQR;
+window.downloadQR = downloadQR;
+window.qrBackdrop = qrBackdrop;
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  loadGuests(); // Kick off Firebase load
 
   document.getElementById('tables-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeTables();
@@ -1469,7 +1541,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setTimeout(() => {
       const searchBox = document.getElementById('sf-search');
-      // Prevent automatic focus on smaller screens so the mobile keyboard doesn't pop up immediately
       if(window.innerWidth > 480) searchBox.focus();
   }, 400);
 });
