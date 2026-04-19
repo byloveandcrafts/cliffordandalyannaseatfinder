@@ -1158,11 +1158,12 @@ body::before {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCnHhAE5N6JcJlZpQtSA_VsPSnLVhczh5w",
   authDomain: "clifford-and-alyanna.firebaseapp.com",
+  databaseURL: "https://clifford-and-alyanna-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "clifford-and-alyanna",
   storageBucket: "clifford-and-alyanna.firebasestorage.app",
   messagingSenderId: "897111732601",
@@ -1170,20 +1171,20 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const guestDocRef = doc(db, "seatfinder", "guestData"); // Saves all data to a single document
+const db = getDatabase(app);
+const guestRef = ref(db, "seatfinder/guestData"); // Saves all data to a single node
 
 /* ── GUEST DATA ── */
 let guests = [];
 
 async function loadGuests() {
   try {
-    const docSnap = await getDoc(guestDocRef);
-    if (docSnap.exists()) {
-      guests = docSnap.data().guests || [];
+    const snapshot = await get(guestRef);
+    if (snapshot.exists()) {
+      guests = snapshot.val().guests || [];
     } else {
       guests = getDefaultGuests();
-      await saveGuests(); // Initialize defaults in Firestore
+      await saveGuests(); // Initialize defaults in Realtime DB
     }
   } catch(e) { 
     console.error("Firebase Error:", e);
@@ -1197,7 +1198,7 @@ async function loadGuests() {
 
 async function saveGuests() { 
   try {
-    await setDoc(guestDocRef, { guests: guests });
+    await set(guestRef, { guests: guests });
   } catch(e) {
     console.error("Firebase Save Error:", e);
   }
